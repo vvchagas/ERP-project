@@ -24,44 +24,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useSyncStore } from '@/stores/syncStore'
+import { useSyncStore } from '../stores/syncStore'
 
 const syncStore = useSyncStore()
-const loading = ref(false)
-const status = ref<{ type: string; message: string } | null>(null)
-const lastSync = ref({ products: '', orders: '' })
 
-const syncProducts = async () => {
-  loading.value = true
-  try {
-    const response = await fetch('/api/sync/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    const data = await response.json()
-    status.value = { type: 'success', message: `${data.count} produtos sincronizados` }
-    lastSync.value.products = new Date().toLocaleString()
-  } catch (error) {
-    status.value = { type: 'error', message: 'Erro na sincronização' }
-  } finally {
-    loading.value = false
-  }
-}
+const loading = syncStore.loading
+const status = syncStore.status
+const lastSync = syncStore.lastSync
 
-const syncOrders = async () => {
-  loading.value = true
-  try {
-    const response = await fetch('/api/sync/orders', { method: 'POST' })
-    const data = await response.json()
-    status.value = { type: 'success', message: `${data.count} pedidos sincronizados` }
-    lastSync.value.orders = new Date().toLocaleString()
-  } catch (error) {
-    status.value = { type: 'error', message: 'Erro na sincronização' }
-  } finally {
-    loading.value = false
-  }
-}
+const syncProducts = () => syncStore.syncProducts()
+const syncOrders = () => syncStore.syncOrders()
 </script>
 
 <style scoped>
