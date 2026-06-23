@@ -2,10 +2,12 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import '/style.css'
 
-import App from './views/AppView.vue'
 import router from './router'
 
+import App from './views/AppView.vue'
+
 const app = createApp(App)
+
 
 app.use(createPinia())
 app.use(router)

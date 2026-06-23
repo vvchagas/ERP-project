@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import { syncProductsController, syncOrdersController } from '@/controllers/syncController'
+import { syncProductsController, syncOrdersController } from '../controllers/SyncController'
 
 export const syncRoutes = async (app: FastifyInstance) => {
   app.post('/sync/products', syncProductsController)

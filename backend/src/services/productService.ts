@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma'
-import { nuvemshopAPI } from '../../api/nuvemShopApi'
+import { nuvemshopAPI } from '../api/nuvemShopApi'
 
 export type CreateProductInput = {
   name: string

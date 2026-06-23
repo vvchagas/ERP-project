@@ -3,8 +3,8 @@ import { computed, ref } from 'vue'
 import { useSyncStore } from '@/stores/syncStore'
 
 
-type Category = 'celulares' | 'notebooks' | 'tablets' | 'acessorios'
 
+type Category = 'celulares' | 'notebooks' | 'tablets' | 'acessorios'
 type Product = {
   id: string
   name: string
@@ -13,8 +13,8 @@ type Product = {
   category: Category
 }
 
-
 const syncStore = useSyncStore()
+
 
 const products = ref<Product[]>([
   { id: '1', name: 'Smartphone Galaxy S24', price: 2799.0, stockLevel: 8, category: 'celulares' },
@@ -60,47 +60,37 @@ function addToCart() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-custom bg-cover bg-center">
-    <header class="w-full bg-white/80 backdrop-blur border-b border-gray-200">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center">
-            T
-          </div>
-          <div>
-            <h1 class="text-xl font-bold text-blue-900">Tech Flow</h1>
-            <p class="text-xs text-gray-600">Loja</p>
-          </div>
-        </div>
+  <AppShell>
 
-        <div class="flex items-center gap-3">
-          <button
-            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-            @click="syncNow"
-            :disabled="syncStore.loading"
-          >
-            {{ syncStore.loading ? 'Sincronizando...' : 'Sincronizar Produtos' }}
-          </button>
+    <template #header-right>
+      <div class="flex items-center gap-3">
+        <button
+          class="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors font-semibold"
+          @click="syncNow"
+          :disabled="syncStore.loading"
+        >
+          {{ syncStore.loading ? 'Sincronizando...' : 'Sincronizar Produtos' }}
+        </button>
 
-          <div class="px-3 py-2 rounded-lg bg-gray-100 text-gray-800">
-            Carrinho: <span class="font-semibold">{{ cartCount }}</span>
-          </div>
+        <div class="hidden sm:block px-3 py-2 rounded-xl bg-slate-100 text-slate-800">
+          Carrinho: <span class="font-semibold">{{ cartCount }}</span>
         </div>
       </div>
-    </header>
+    </template>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
       <section class="mb-6">
+
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <h2 class="text-3xl font-extrabold text-blue-900">Catálogo</h2>
-            <p class="text-gray-700 mt-1">Filtre por categoria e busque por nome.</p>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">Catálogo</h2>
+            <p class="text-slate-700 mt-1">Filtre por categoria e busque por nome.</p>
           </div>
 
           <div class="flex items-center gap-3">
             <input
               v-model="query"
-              class="w-full md:w-72 px-3 py-2 rounded-lg border border-gray-200 bg-white/90"
+              class="w-full md:w-72 px-4 py-2 rounded-xl border border-slate-200 bg-white/90 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               placeholder="Buscar (ex: notebook, celular...)"
             />
           </div>
@@ -110,11 +100,11 @@ function addToCart() {
           <button
             v-for="c in categories"
             :key="c.key"
-            class="px-3 py-2 rounded-lg border transition-colors"
+            class="px-3 py-2 rounded-xl border transition-colors font-medium"
             :class="
               activeCategory === c.key
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white/80 text-gray-800 border-gray-200 hover:bg-white'
+                : 'bg-white/80 text-slate-800 border-slate-200 hover:bg-white'
             "
             @click="activeCategory = c.key"
           >
@@ -124,11 +114,11 @@ function addToCart() {
 
         <div
           v-if="syncStore.status"
-          class="mt-4 p-4 rounded-lg border"
+          class="mt-4 p-4 rounded-xl border"
           :class="
             syncStore.status.type === 'success'
-              ? 'bg-green-50 border-green-200 text-green-800'
-              : 'bg-red-50 border-red-200 text-red-800'
+              ? 'bg-green-50 border-green-200 text-green-900'
+              : 'bg-red-50 border-red-200 text-red-900'
           "
         >
           {{ syncStore.status.message }}
@@ -139,23 +129,21 @@ function addToCart() {
         <article
           v-for="p in filtered"
           :key="p.id"
-          class="p-6 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+          class="p-6 bg-white/90 backdrop-blur border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
         >
           <div class="flex items-start justify-between gap-3">
-            <h3 class="text-lg font-bold text-gray-900 line-clamp-2">{{ p.name }}</h3>
-            <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-              {{ p.category }}
-            </span>
+            <h3 class="text-base md:text-lg font-bold text-slate-900 line-clamp-2">{{ p.name }}</h3>
+            <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 whitespace-nowrap">{{ p.category }}</span>
           </div>
 
-          <p class="text-sm text-gray-600 mt-2">
-            Estoque: <span class="font-semibold">{{ p.stockLevel }}</span>
+          <p class="text-sm text-slate-600 mt-2">
+            Estoque: <span class="font-semibold text-slate-900">{{ p.stockLevel }}</span>
           </p>
 
-          <div class="mt-4 flex items-center justify-between">
+          <div class="mt-5 flex items-center justify-between gap-3">
             <span class="text-lg font-semibold text-blue-700">R$ {{ p.price }}</span>
             <button
-              class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              class="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               :disabled="p.stockLevel <= 0"
               @click="addToCart"
             >
@@ -165,11 +153,18 @@ function addToCart() {
         </article>
       </section>
 
-      <div v-if="filtered.length === 0" class="mt-10 text-center text-gray-700">
+      <div v-if="filtered.length === 0" class="mt-10 text-center text-slate-700 bg-white/70 border border-slate-200 rounded-2xl py-10">
         Nenhum produto encontrado para os filtros atuais.
       </div>
     </main>
-  </div>
+
+    <footer class="border-t border-slate-200">
+      <div class="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between gap-4">
+        <p class="text-sm text-slate-600">© {{ new Date().getFullYear() }} Tech Flow</p>
+        <div class="text-sm text-slate-600">Frontend • Vue + Tailwind</div>
+      </div>
+    </footer>
+  </AppShell>
 </template>
 
 <style scoped>

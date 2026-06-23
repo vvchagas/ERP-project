@@ -5,6 +5,11 @@ const router = createRouter({
   routes: [
     {
       name: 'home',
+      path: '/',
+      component: () => import('../views/AppView.vue')
+    },
+    {
+      name: 'home-legacy',
       path: '/home',
       component: () => import('../views/AppView.vue')
     },
@@ -12,6 +17,11 @@ const router = createRouter({
       name: 'sync',
       path: '/sync',
       component: () => import('../views/SyncNuvemShopView.vue')
+    },
+    {
+      name: 'about',
+      path: '/about',
+      component: () => import('../views/AboutView.vue')
     }
   ],
 })
