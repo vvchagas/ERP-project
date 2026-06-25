@@ -6,6 +6,7 @@ export type CreateProductInput = {
   price: number
   stock: number
   sku?: string
+  // opcional: pode ser usado como referência externa; NÃO é necessário para criar na Nuvemshop.
   storeId?: string
 }
 
@@ -13,33 +14,40 @@ export type CreateProductResult = {
   nuvemshopId: number
 }
 
+const toSafeNumber = (value: unknown): number => {
+  const n = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(n)) throw new Error(`Invalid number: ${String(value)}`)
+  return n
+}
+
 export async function createProductService(input: CreateProductInput): Promise<CreateProductResult> {
-  const { name, price, stock, sku, storeId } = input
+  const { name, price, stock, sku } = input
 
-  // nuvemShop API atual do projeto só está parcialmente implementada.
-  // Para manter a tarefa "somente funcionalidade já aplicada" no backend,
-  // este serviço não cria produto na Tienda Nube por enquanto.
-  // Ele apenas persiste localmente como placeholder.
+  // 1) Cria produto na Nuvemshop
+  const api = new nuvemshopAPI()
+  const created = await api.createProduct({ name, price, stock, sku })
 
-  // Use o mesmo padrão do syncProductsService (upsert por nuvemshopId),
-  // mas aqui não temos nuvemshopId do endpoint.
-  // Então não salvaremos caso falte storeId.
-  if (!storeId) {
-    throw new Error('storeId is required to create product on Nuvemshop')
-  }
+  // 2) Extrai id real retornado pela Nuvemshop
+  const nuvemshopIdRaw = (created as any)?.id
+  const nuvemshopId = nuvemshopIdRaw === undefined ? toSafeNumber((created as any)?.product?.id) : toSafeNumber(nuvemshopIdRaw)
 
-  // fallback: guarda um registro local usando storeId como nuvemshopId numérico
-  const nuvemshopId = Number(storeId)
-  if (!Number.isFinite(nuvemshopId)) {
-    throw new Error('storeId must be a numeric id')
-  }
-
+  // 3) Persiste no banco local (cache/controle)
   await prisma.product.upsert({
     where: { nuvemshopId },
-    update: { name, price, stock },
-    create: { nuvemshopId, name, price, stock },
+    update: {
+      name,
+      price,
+      stock,
+    },
+    create: {
+      nuvemshopId,
+      name,
+      price,
+      stock,
+    },
   })
 
   return { nuvemshopId }
 }
+
 
