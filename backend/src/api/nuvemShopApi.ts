@@ -1,17 +1,13 @@
-export class nuvemshopAPI {
-  static baseURL = 'https://api.nuvemshop.com.br/v1'
+export class NuvemshopAPI {
+  private baseURL = 'https://api.nuvemshop.com.br/v1'
+  private token = process.env.NUVEMSHOP_TOKEN
 
-  // Esperado: NUVEMSHOP_TOKEN=seu_token (sem "Bearer ")
-  static token = process.env.NUVEMSHOP_TOKEN
-
-  private static authHeaders() {
-    if (!nuvemshopAPI.token) {
+  private authHeaders() {
+    if (!this.token) {
       throw new Error('NUVEMSHOP_TOKEN não configurado no backend')
     }
 
-    // Nuvemshop costuma aceitar Authorization: Bearer {token}.
-    // Seu projeto atual usa header "Authentication" — mantemos compatibilidade.
-    const bearer = `Bearer ${nuvemshopAPI.token}`
+    const bearer = `Bearer ${this.token}`
 
     return {
       'Content-Type': 'application/json',
@@ -21,9 +17,9 @@ export class nuvemshopAPI {
   }
 
   getProducts = async (): Promise<any[]> => {
-    const response = await fetch(`${nuvemshopAPI.baseURL}/products`, {
+    const response = await fetch(`${this.baseURL}/products`, {
       method: 'GET',
-      headers: nuvemshopAPI.authHeaders(),
+      headers: this.authHeaders(), // Usando 'this' em vez do nome da classe
     })
 
     if (!response.ok) {
@@ -35,9 +31,9 @@ export class nuvemshopAPI {
   }
 
   getOrders = async (): Promise<any[]> => {
-    const response = await fetch(`${nuvemshopAPI.baseURL}/orders`, {
+    const response = await fetch(`${this.baseURL}/orders`, {
       method: 'GET',
-      headers: nuvemshopAPI.authHeaders(),
+      headers: this.authHeaders(),
     })
 
     if (!response.ok) {
@@ -48,30 +44,23 @@ export class nuvemshopAPI {
     return (Array.isArray(data) ? data : []) as any[]
   }
 
-  // Criação real de produto na Nuvemshop
   createProduct = async (input: {
     name: string
     price: number
     stock: number
     sku?: string
-    // storeId é opcional no seu schema atual; mantemos como um campo externo.
     storeId?: string
   }): Promise<any> => {
     const body: Record<string, unknown> = {
-      // Campos comuns do catálogo na Nuvemshop (ajuste se seu layout exigir campos adicionais)
       name: input.name,
       price: input.price,
       sku: input.sku,
+      quantity: input.stock // Mapeamento
     }
 
-    // Muitos endpoints esperam estoque por variation/variant.
-    // Como o seu projeto atual sincroniza por "quantity" via GET /products,
-    // mapeamos stock para "quantity".
-    body.quantity = input.stock
-
-    const response = await fetch(`${nuvemshopAPI.baseURL}/products`, {
+    const response = await fetch(`${this.baseURL}/products`, {
       method: 'POST',
-      headers: nuvemshopAPI.authHeaders(),
+      headers: this.authHeaders(),
       body: JSON.stringify(body),
     })
 
@@ -84,4 +73,4 @@ export class nuvemshopAPI {
   }
 }
 
-
+export const nuvemshopAPI = new NuvemshopAPI()

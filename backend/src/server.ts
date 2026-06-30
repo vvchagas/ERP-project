@@ -5,9 +5,6 @@ import { syncRoutes } from './routes/syncRoutes'
 import { authRoutes } from './routes/authRoutes'
 import { productRoutes } from './routes/productRoutes'
 
-
-
-
 const app = fastify({ logger: false })
 
 app.get('/health', async () => {
