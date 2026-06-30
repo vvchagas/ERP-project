@@ -1,8 +1,10 @@
+import 'dotenv/config'
 import fastify from 'fastify'
 
 import { syncRoutes } from './routes/syncRoutes'
 import { authRoutes } from './routes/authRoutes'
 import { productRoutes } from './routes/productRoutes'
+
 
 
 
